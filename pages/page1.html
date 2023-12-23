@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Личная страничка</title>
+	<link rel='stylesheet' href='../style.css'>
+<script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+<script src="js/кот.js?1698181381289"></script>
+<script>
+var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
+function init() {
+	canvas = document.getElementById("canvas");
+	anim_container = document.getElementById("animation_container");
+	dom_overlay_container = document.getElementById("dom_overlay_container");
+	var comp=AdobeAn.getComposition("CF926548F827DF46956265A5A4DE5CED");
+	var lib=comp.getLibrary();
+	var loader = new createjs.LoadQueue(false);
+	loader.addEventListener("fileload", function(evt){handleFileLoad(evt,comp)});
+	loader.addEventListener("complete", function(evt){handleComplete(evt,comp)});
+	var lib=comp.getLibrary();
+	loader.loadManifest(lib.properties.manifest);
+}
+function handleFileLoad(evt, comp) {
+	var images=comp.getImages();	
+	if (evt && (evt.item.type == "image")) { images[evt.item.id] = evt.result; }	
+}
+function handleComplete(evt,comp) {
+	//This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
+	var lib=comp.getLibrary();
+	var ss=comp.getSpriteSheet();
+	var queue = evt.target;
+	var ssMetadata = lib.ssMetadata;
+	for(i=0; i<ssMetadata.length; i++) {
+		ss[ssMetadata[i].name] = new createjs.SpriteSheet( {"images": [queue.getResult(ssMetadata[i].name)], "frames": ssMetadata[i].frames} )
+	}
+	exportRoot = new lib.кот();
+	stage = new lib.Stage(canvas);	
+	//Registers the "tick" event listener.
+	fnStartAnimation = function() {
+		stage.addChild(exportRoot);
+		createjs.Ticker.framerate = lib.properties.fps;
+		createjs.Ticker.addEventListener("tick", stage);
+	}	    
+	//Code to support hidpi screens and responsive scaling.
+	AdobeAn.makeResponsive(false,'both',false,1,[canvas,anim_container,dom_overlay_container]);	
+	AdobeAn.compositionLoaded(lib.properties.id);
+	fnStartAnimation();
+}
+</script>
+</head>
+<div id="bg"></div>
+<body onload="init()">
+	<header>
+		<nav id="nav">
+			<div onclick="location.href='../index.html'"><h1><a style="text-decoration:none;">← Назад</a></h1></div>
+		</nav>
+	</header>
+	
+	<section id="main_container">
+		<section id="labs1">
+			<div id="animation_container" style="background-color:rgba(255, 255, 255, 1.00); width:1280px; height:720px">
+			<canvas id="canvas" width="1280" height="720" style="position: absolute; display: block; background-color:rgba(255, 255, 255, 1.00);"></canvas>
+			<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:1280px; height:720px; position: absolute; left: 0px; top: 0px; display: block;">
+			</div>
+			</div>
+		</section>
+		
+		<section id="contacts">
+			<h1 style="font-size:30px">Simon's cat</h1><br>
+			<h3>Не говорите, что у вас в детстве не было множества гивок в телефоне с этим черно-белым котом! Встречайте, непревзойденного кота, пытающегося словить раздражающую красную точку!<br><br>
+			Небольшая покадровая анимация порезанная и собранная воедино</h3>
+		</section>
+	</section>
+
+	<footer>
+		<h2>Antares Inc. - netami0715@gmail.com<h2>
+		<h2>Менгазова Наталья 2023<h2>
+	</footer>
+</body>
+</html>
